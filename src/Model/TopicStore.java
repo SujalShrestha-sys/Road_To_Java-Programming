@@ -10,12 +10,11 @@ public class TopicStore {
     private final ArrayList<Topic> topics = new ArrayList<>();
     private int nextId = 1;
 
-    public Topic addTopic(String name) {
+    public void addTopic(String name) {
         // Assign ID and timestamps at creation time.
         Timestamp now = new Timestamp(System.currentTimeMillis());
         Topic topic = new Topic(nextId++, name, now, now);
         topics.add(topic);
-        return topic;
     }
 
     public List<Topic> getTopics() {
