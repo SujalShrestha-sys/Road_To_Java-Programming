@@ -3,12 +3,16 @@ package Model;
 import java.sql.Timestamp;
 
 public class Topic {
-    private final int id;
-    private final String name;
-    // Timestamp fields required by the topic spec.
-    private final Timestamp createdAt;
+
+    private int id;
+    private String name;
+    private Timestamp createdAt;
     private Timestamp updatedAt;
 
+    // Default constructor
+    public Topic(){}
+
+    // Parameterized constructor
     public Topic(int id, String name, Timestamp createdAt, Timestamp updatedAt) {
         this.id = id;
         this.name = name;
@@ -16,6 +20,13 @@ public class Topic {
         this.updatedAt = updatedAt;
     }
 
+    public Topic(String name, Timestamp createdAt, Timestamp updatedAt) {
+        this.name = name;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
+    // Getters
     public int getId() {
         return id;
     }
@@ -32,13 +43,21 @@ public class Topic {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Timestamp updatedAt) {
+    // Setters
+    public void setId(int id){
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+        this.updatedAt = new Timestamp(System.currentTimeMillis());
+    }
+
+    public void setCreatedAt(Timestamp createdAt){
+        this.createdAt = createdAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt){
         this.updatedAt = updatedAt;
     }
-
-    @Override
-    public String toString() {
-        return id + ". " + name;
-    }
-
 }

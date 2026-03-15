@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Topic Management System</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="app-shell">
+    <header class="hero">
+        <p class="eyebrow">Learning Log</p>
+        <h1>Topic Management System</h1>
+        <p class="lead">Manage, review, and add new learning topics at a glance.</p>
+    </header>
+
+    <main class="content-grid">
+        <section class="panel" id="topics-panel">
+            <div class="panel-header">
+                <h2>Existing topics</h2>
+                <span class="badge" id="topic-count">0 topics</span>
+            </div>
+            <div class="panel-toolbar">
+                <label for="topic-filter">Filter topics</label>
+                <input type="search" id="topic-filter" placeholder="Search by name" aria-label="Filter topics" />
+                <span class="muted" id="filter-hint">Showing every topic.</span>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Topic</th>
+                        <th>Category</th>
+                    </tr>
+                    </thead>
+                    <tbody id="topics-body"></tbody>
+                </table>
+                <p class="empty" id="empty-state">No topics yet. Add one using the form.</p>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-header">
+                <h2>Add a topic</h2>
+                <p class="muted">Only the name is required. Timestamps will be managed by the backend.</p>
+            </div>
+            <form id="topic-form">
+                <label for="topic-name">Topic name</label>
+                <input type="text" id="topic-name" name="topic-name" placeholder="e.g. Spring Boot Basics" required />
+                <button type="submit">Create topic</button>
+                <p class="feedback" id="form-feedback"></p>
+            </form>
+        </section>
+    </main>
+
+    <section class="insights-grid">
+        <article class="panel stats-panel">
+            <div class="panel-header">
+                <h3>Insight snapshot</h3>
+                <span class="badge secondary">Auto-updated</span>
+            </div>
+            <div class="stats-row">
+                <div class="stat-card">
+                    <p>Topics tracked</p>
+                    <strong id="stat-total">0</strong>
+                    <span class="muted">all-time</span>
+                </div>
+                <div class="stat-card">
+                    <p>Latest topic</p>
+                    <strong id="stat-latest">—</strong>
+                    <span class="muted">most recent entry</span>
+                </div>
+                <div class="stat-card">
+                    <p>Preferred category</p>
+                    <strong id="stat-category">—</strong>
+                    <span class="muted">based on topics</span>
+                </div>
+            </div>
+        </article>
+
+        <article class="panel activity-panel">
+            <div class="panel-header">
+                <h3>Recent activity</h3>
+                <span class="badge secondary">Live</span>
+            </div>
+            <ul id="activity-feed" class="activity-feed"></ul>
+        </article>
+
+        <article class="panel tips-panel">
+            <div class="panel-header">
+                <h3>Next steps</h3>
+            </div>
+            <p>Ship this UI by connecting it to the Java backend, then let learners engage with study logs in the browser.</p>
+            <ul class="tip-list">
+                <li>Expose REST endpoints for listing/creating topics.</li>
+                <li>Use `fetch` to POST new entries instead of relying on the local array.</li>
+                <li>Track timestamps in the backend and push them back into the UI.</li>
+            </ul>
+        </article>
+    </section>
+</div>
+
+<!-- <script>
+
+
+  const topicBody = document.getElementById("topics-body");
+  const topicCount = document.getElementById("topic-count");
+  const emptyState = document.getElementById("empty-state");
+  const feedback = document.getElementById("form-feedback");
+  const filterHint = document.getElementById("filter-hint");
+  const filterInput = document.getElementById("topic-filter");
+  const activityFeed = document.getElementById("activity-feed");
+  const statTotal = document.getElementById("stat-total");
+  const statLatest = document.getElementById("stat-latest");
+  const statCategory = document.getElementById("stat-category");
+
+  const renderTopics = (filterValue = "") => {
+    const query = filterValue.trim().toLowerCase();
+    const filteredTopics = query
+      ? topics.filter(topic => topic.name.toLowerCase().includes(query))
+      : [...topics];
+
+    topicBody.innerHTML = "";
+    filteredTopics.forEach(topic => {
+      const row = document.createElement("tr");
+      row.innerHTML = `<td>${topic.id}</td><td>${topic.name}</td><td>${topic.category}</td>`;
+      topicBody.append(row);
+    });
+
+    topicCount.textContent = `${topics.length} topic${topics.length === 1 ? "" : "s"}`;
+    emptyState.style.display = filteredTopics.length ? "none" : "block";
+    filterHint.textContent = query
+      ? `Showing ${filteredTopics.length} result${filteredTopics.length === 1 ? "" : "s"}`
+      : "Showing every topic.";
+
+    renderActivity();
+    updateStats();
+  };
+
+  const renderActivity = () => {
+    activityFeed.innerHTML = "";
+    const recent = topics.slice(-3).reverse();
+    recent.forEach(topic => {
+      const item = document.createElement("li");
+      item.innerHTML = `
+        <div>
+          <strong>${topic.name}</strong>
+          <span class="muted">${topic.category}</span>
+        </div>
+        <time>${topic.updatedAt}</time>
+      `;
+      activityFeed.append(item);
+    });
+  };
+
+  const updateStats = () => {
+    statTotal.textContent = topics.length;
+    const latest = topics[topics.length - 1];
+    statLatest.textContent = latest ? latest.name : "—";
+    statCategory.textContent = latest ? latest.category : "—";
+  };
+
+  renderTopics();
+
+  filterInput.addEventListener("input", event => renderTopics(event.target.value));
+
+  document.getElementById("topic-form").addEventListener("submit", event => {
+    event.preventDefault();
+    const nameField = document.getElementById("topic-name");
+    const topicName = nameField.value.trim();
+
+    if (!topicName) {
+      feedback.textContent = "Please enter a topic name.";
+      feedback.classList.add("error");
+      return;
+    }
+
+    feedback.textContent = "Saving...";
+    feedback.classList.remove("error");
+
+    const newTopic = {
+      id: topics.length + 1,
+      name: topicName,
+      category: "Custom",
+      updatedAt: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+    };
+
+    topics.push(newTopic);
+    nameField.value = "";
+    renderTopics(filterInput.value);
+    feedback.textContent = "Topic created locally. Wire a backend POST to finish.";
+  });
+</script> -->
+</body>

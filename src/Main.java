@@ -1,7 +1,6 @@
-package View;
-
 import Controller.TopicController;
 import Model.TopicStore;
+import View.ConsoleView;
 
 public class Main {
     public static void main(String[] args) {
